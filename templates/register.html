@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Daily Tallies</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8">Register</h1>
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">Username:</label>
+                    <input type="text" name="username" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Password:</label>
+                    <input type="password" name="password" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</button>
+            </form>
+            <p class="mt-4 text-center">
+                <a href="{{ url_for('login') }}" class="text-blue-500 hover:text-blue-600">Already have an account? Login here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
