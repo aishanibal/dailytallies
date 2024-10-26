@@ -17,21 +17,63 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            <form method="POST" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700">Username:</label>
-                    <input type="text" name="username" required class="w-full px-3 py-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Password:</label>
-                    <input type="password" name="password" required class="w-full px-3 py-2 border rounded">
-                </div>
-                <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</button>
-            </form>
-            <p class="mt-4 text-center">
-                <a href="{{ url_for('login') }}" class="text-blue-500 hover:text-blue-600">Already have an account? Login here</a>
-            </p>
-        </div>
+<form method="POST" class="space-y-4">
+    <!-- Existing fields for username and password -->
+    <div>
+        <label class="block text-gray-700">Username:</label>
+        <input type="text" name="username" required class="w-full px-3 py-2 border rounded">
     </div>
-</body>
-</html>
+    <div>
+        <label class="block text-gray-700">Password:</label>
+        <input type="password" name="password" required class="w-full px-3 py-2 border rounded">
+    </div>
+
+    <!-- New fields for additional information -->
+    <div>
+        <label class="block text-gray-700">Age Range:</label>
+        <select name="age_range" required class="w-full px-3 py-2 border rounded">
+            <option value="">Select Age Range</option>
+            <option value="18-24">18-24</option>
+            <option value="25-34">25-34</option>
+            <option value="35-44">35-44</option>
+            <option value="45-54">45-54</option>
+            <option value="55-64">55-64</option>
+            <option value="65+">65+</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="block text-gray-700">Gender:</label>
+        <select name="gender" required class="w-full px-3 py-2 border rounded">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="non-binary">Non-Binary</option>
+            <option value="prefer_not_to_say">Prefer Not to Say</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="block text-gray-700">Employment Status:</label>
+        <select name="employment_status" required class="w-full px-3 py-2 border rounded">
+            <option value="">Select Employment Status</option>
+            <option value="student">Student</option>
+            <option value="employed">Employed</option>
+            <option value="unemployed">Unemployed</option>
+            <option value="retired">Retired</option>
+        </select>
+    </div>
+
+    <!-- Prompt categories selection as checkboxes -->
+    <div>
+        <label class="block text-gray-700">Select Prompt Categories:</label>
+        {% for category, example in prompt_categories.items() %}
+            <div class="flex items-center">
+                <input type="checkbox" name="prompt_categories" value="{{ category }}" class="mr-2">
+                <label>{{ category }} <small>(Ex: {{ example }})</small></label>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</button>
+</form>
