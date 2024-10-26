@@ -23,11 +23,6 @@ def init_db():
     conn = sqlite3.connect('daily_tallies.db')
     c = conn.cursor()
 
-
-    # Example: view all data in the users table
-    #c.execute("SELECT * FROM users")
-    #rows = c.fetchall()
-
     #for row in rows:
       #  print(row)
 
@@ -247,6 +242,7 @@ def view_journal():
 @app.route('/view_journal')
 @login_required
 def view_journal():
+    print("hellofds")
     year = int(request.args.get('year', datetime.now().year))
     month = int(request.args.get('month', datetime.now().month))
 
@@ -269,21 +265,31 @@ def view_journal():
     end_date = f"{year}-{month + 1:02d}-01" if month < 12 else f"{year + 1}-01-01"
 
     c.execute("""
-        SELECT date, COUNT(DISTINCT prompt_number) as response_count,
-               (SELECT entry FROM journal_entries 
-                WHERE user_id = responses.user_id 
-                AND date = responses.date) as journal_entry
-        FROM responses 
-        WHERE user_id = ? AND date >= ? AND date < ?
+        SELECT date, 
+               COUNT(DISTINCT journal_entries.id) AS entry_count,
+               journal_entries.entry AS journal_entry
+        FROM journal_entries
+        JOIN users ON users.id = journal_entries.user_id
+        WHERE users.id = ? 
+          AND date >= ? 
+          AND date < ?
         GROUP BY date
     """, (session['user_id'], start_date, end_date))
 
+    rows = c.fetchall()
+    print(rows)
+
+    # Print each row in the table
+    for row in rows:
+        print("SDKJf")
+        print(row)
+    print("\n" + "-" * 40 + "\n")  # Separator between tables
+
     # Create a dictionary of dates with response counts and journal entries
     response_data = {}
-    for row in c.fetchall():
+    for row in rows:
         date = row[0]
         response_data[date] = {
-            'response_count': row[1],
             'journal_entry': row[2] if row[2] else None
         }
 
