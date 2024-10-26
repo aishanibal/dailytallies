@@ -22,11 +22,11 @@ def init_db():
 
 
     # Example: view all data in the users table
-    c.execute("SELECT * FROM users")
-    rows = c.fetchall()
+    #c.execute("SELECT * FROM users")
+    #rows = c.fetchall()
 
-    for row in rows:
-        print(row)
+    #for row in rows:
+      #  print(row)
 
 
 
@@ -48,10 +48,16 @@ def init_db():
                   response TEXT,
                   FOREIGN KEY (user_id) REFERENCES users (id))''')
 
+    c.execute('''CREATE TABLE IF NOT EXISTS journal_entries
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      user_id INTEGER,
+                      date TEXT,
+                      entry TEXT,
+                      FOREIGN KEY (user_id) REFERENCES users (id))''')
+    # Other initialization code...
+
     conn.commit()
     conn.close()
-
-
 
 
 # Run database initialization
@@ -118,6 +124,35 @@ def login():
             return redirect(url_for('dashboard'))
         flash('Invalid username or password!')
     return render_template('login.html')
+
+
+# Journal Page Route
+@app.route('/journal', methods=['GET'])
+@login_required
+def journal():
+    return render_template('journal.html')
+
+# Submit Journal Entry Route
+@app.route('/submit_journal', methods=['POST'])
+@login_required
+def submit_journal():
+    journal_entry = request.form['journal_entry']
+    today = datetime.now().strftime('%Y-%m-%d')
+
+    # Store the journal entry in the database (assuming a 'journal_entries' table exists)
+    conn = sqlite3.connect('daily_tallies.db')
+    c = conn.cursor()
+    c.execute("""INSERT INTO journal_entries (user_id, date, entry)
+                 VALUES (?, ?, ?)""",
+              (session['user_id'], today, journal_entry))
+    conn.commit()
+    conn.close()
+
+    flash('Journal entry saved successfully!')
+    return redirect(url_for('journal'))
+
+# Make sure the database table for journal entries exists
+
 
 # Dashboard route
 @app.route('/dashboard')
