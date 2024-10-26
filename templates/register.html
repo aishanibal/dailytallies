@@ -3,8 +3,15 @@
 <head>
     <title>Register - Daily Tallies</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100">
+<nav class="bg-blue-500 p-4 text-white shadow md" style="background-color: #D4EBED; color: #689689;">
+        <div class="container mx-auto flex justify-between items-center">
+            <img src="{{ url_for('static', filename='images/daily_name.png') }}" class="h-14 w-25"  alt="Daily Tallies Logo">
+        </div>
+</nav>
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-4xl font-bold text-center mb-8">Register</h1>
         <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
