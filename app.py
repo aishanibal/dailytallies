@@ -50,6 +50,7 @@ def extract_tasks(claude_response):
 
         # Clean up the tasks
         tasks = [task.strip() for task in tasks if task.strip()]
+        tasks = [task.replace('\\n', '').strip() for task in tasks if task.strip()]
 
         print("Extracted tasks:", tasks)  # Debug print
 
