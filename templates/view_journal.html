@@ -31,7 +31,7 @@
                 {% for day in week %}
                 {% if day != 0 %}
                 {% set date = '%04d-%02d-%02d'|format(year, month, day) %}
-                <td class="border p-4 h-32 align-top  {% if date == current_date %}bg-yellow-100{% endif %}">
+                <td class="border p-4 h-32 align-top  {% if date == current_date %}bg-blue-100{% endif %}">
                     <div class="flex justify-between"> <span class="font-bold">{{ day }}</span> </div>
                     {% if date in response_data and response_data[date]['journal_entry'] %}
 
