@@ -10,12 +10,14 @@
 <body class="bg-gray-100 min-h-screen">
     <!-- Navigation Bar -->
     <nav class="bg-blue-500 p-4 text-white">
-        <div class="container mx-auto flex justify-between">
-            <img src="{{ url_for('static', filename='images/daily_logo.png') }}" height="50px" width="50px" alt="Daily Tallies Logo">
-            <a href="{{ url_for('dashboard') }}" class="text-lg font-bold">Prompt Dashboard</a>
-            <a href="{{ url_for('journal') }}" class="text-lg font-bold">Journal</a>
-            <a href="{{ url_for('view_journal') }}" class="text-lg font-bold">History</a>
-            <a href="{{ url_for('logout') }}" class="text-lg font-bold">Logout</a>
+        <div class="container mx-auto flex justify-between items-center">
+            <img src="{{ url_for('static', filename='images/daily_logo (2).png') }}" height="50px" width="50px" alt="Daily Tallies Logo">
+            <div class="flex space-x-4"> <!-- Flex container for links -->
+                <a href="{{ url_for('dashboard') }}" class="text-lg font-bold hover:text-blue-300">Tasks</a>
+                <a href="{{ url_for('journal') }}" class="text-lg font-bold hover:text-blue-300">Journal</a>
+                <a href="{{ url_for('view_journal') }}" class="text-lg font-bold hover:text-blue-300">History</a>
+                <a href="{{ url_for('logout') }}" class="text-lg font-bold hover:text-blue-300">Logout</a>
+            </div>
         </div>
     </nav>
 
