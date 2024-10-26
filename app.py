@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from datetime import datetime
 from functools import wraps
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change this to a secure secret key
@@ -139,12 +140,23 @@ def submit_journal():
     journal_entry = request.form['journal_entry']
     today = datetime.now().strftime('%Y-%m-%d')
 
-    # Store the journal entry in the database (assuming a 'journal_entries' table exists)
     conn = sqlite3.connect('daily_tallies.db')
     c = conn.cursor()
-    c.execute("""INSERT INTO journal_entries (user_id, date, entry)
-                 VALUES (?, ?, ?)""",
-              (session['user_id'], today, journal_entry))
+
+    # Check if an entry already exists for today; if so, update it, otherwise insert a new entry
+    c.execute("""SELECT id FROM journal_entries WHERE user_id = ? AND date = ?""",
+              (session['user_id'], today))
+    existing_entry = c.fetchone()
+
+    if existing_entry:
+        # Update existing entry
+        c.execute("""UPDATE journal_entries SET entry = ? WHERE id = ?""",
+                  (journal_entry, existing_entry[0]))
+    else:
+        # Insert new entry
+        c.execute("""INSERT INTO journal_entries (user_id, date, entry) VALUES (?, ?, ?)""",
+                  (session['user_id'], today, journal_entry))
+
     conn.commit()
     conn.close()
 
@@ -210,6 +222,25 @@ def submit_response():
 
     flash('Response saved successfully!')
     return redirect(url_for('dashboard'))
+
+
+@app.route('/view_journal')
+@login_required
+def view_journal():
+    conn = sqlite3.connect('daily_tallies.db')
+    c = conn.cursor()
+
+    # Fetch all journal entries for the logged-in user
+    c.execute("""SELECT date, entry FROM journal_entries WHERE user_id = ? ORDER BY date DESC""",
+              (session['user_id'],))
+    journal_entries = c.fetchall()
+    conn.close()
+
+    # Convert entries to a dictionary for easier access in the template
+    entries_by_date = {entry[0]: entry[1] for entry in journal_entries}
+
+    return render_template('view_journal.html', entries_by_date=entries_by_date)
+
 
 # Logout route
 @app.route('/logout')

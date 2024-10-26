@@ -11,8 +11,9 @@
     <!-- Navigation Bar -->
     <nav class="bg-blue-500 p-4 text-white">
         <div class="container mx-auto flex justify-between">
-            <a href="{{ url_for('dashboard') }}" class="text-lg font-bold">Dashboard</a>
+            <a href="{{ url_for('dashboard') }}" class="text-lg font-bold">Prompt Dashboard</a>
             <a href="{{ url_for('journal') }}" class="text-lg font-bold">Journal</a>
+            <a href="{{ url_for('view_journal') }}" class="text-lg font-bold">History</a>
             <a href="{{ url_for('logout') }}" class="text-lg font-bold">Logout</a>
         </div>
     </nav>
