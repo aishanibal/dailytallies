@@ -1,58 +1,23 @@
+<!-- templates/view_journal.html -->
 {% extends "base.html" %}
 
 {% block title %}View Journal Entries{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="bg-white rounded-lg shadow-lg p-6">
-        <!-- Month Navigation -->
-        <div class="flex justify-between items-center mb-6">
-            <a href="{{ url_for('view_journal', year=prev_year, month=prev_month) }}"
-               class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">&lt; Previous</a>
-            <h2 class="text-2xl font-semibold">{{ month_name }} {{ year }}</h2>
-            <a href="{{ url_for('view_journal', year=next_year, month=next_month) }}"
-               class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Next &gt;</a>
-        </div>
+<h1 class="text-4xl font-bold mb-8">Journal Calendar</h1>
 
-        <!-- Calendar Grid -->
-        <div class="grid grid-cols-7 gap-2">
-            <!-- Days of Week -->
-            {% for day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] %}
-                <div class="text-center font-semibold p-2">{{ day }}</div>
-            {% endfor %}
+<!-- Calendar grid -->
+<div class="grid grid-cols-7 gap-4">
+    {% for day in range(1, 32) %}
+        {% set date = "%02d" % day %}
+        {% set full_date = "2024-10-" + date %}
 
-            <!-- Calendar Days -->
-            {% for week in calendar %}
-                {% for day in week %}
-                    {% if day != 0 %}
-                        {% set date = '%d-%02d-%02d'|format(year, month, day) %}
-                        <div class="border rounded p-2 min-h-[80px] {% if date == current_date %}bg-blue-100{% endif %}">
-                            <div class="flex justify-between items-start">
-                                <span class="font-medium">{{ day }}</span>
-                                {% if date in response_data %}
-                                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                        {{ response_data[date]['response_count'] }}/5
-                                    </span>
-                                {% endif %}
-                            </div>
-                            {% if date in response_data %}
-                                {% if response_data[date]['journal_entry'] %}
-                                    <div class="mt-2 text-xs text-gray-600 truncate">
-                                        {{ response_data[date]['journal_entry'][:50] }}...
-                                    </div>
-                                {% endif %}
-                                <a href="#" onclick="showDayDetails('{{ date }}')"
-                                   class="block mt-2 text-xs text-blue-500 hover:text-blue-700">
-                                    View details
-                                </a>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div class="border rounded p-2 min-h-[80px] bg-gray-50"></div>
-                    {% endif %}
-                {% endfor %}
-            {% endfor %}
+        <div class="border p-4">
+            <h3 class="font-bold">{{ full_date }}</h3>
+            <p>
+                {{ entries_by_date.get(full_date, "No entry") }}
+            </p>
         </div>
-    </div>
+    {% endfor %}
 </div>
 {% endblock %}

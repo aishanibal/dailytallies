@@ -1,8 +1,6 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-import calendar
-import sqlite3
-import random
+from datetime import datetime
 from functools import wraps
 from datetime import datetime, timedelta
 
@@ -225,7 +223,7 @@ def submit_response():
     flash('Response saved successfully!')
     return redirect(url_for('dashboard'))
 
-"""
+
 @app.route('/view_journal')
 @login_required
 def view_journal():
@@ -233,7 +231,7 @@ def view_journal():
     c = conn.cursor()
 
     # Fetch all journal entries for the logged-in user
-    c.execute(SELECT date, entry FROM journal_entries WHERE user_id = ? ORDER BY date DESC,
+    c.execute("""SELECT date, entry FROM journal_entries WHERE user_id = ? ORDER BY date DESC""",
               (session['user_id'],))
     journal_entries = c.fetchall()
     conn.close()
@@ -242,64 +240,8 @@ def view_journal():
     entries_by_date = {entry[0]: entry[1] for entry in journal_entries}
 
     return render_template('view_journal.html', entries_by_date=entries_by_date)
-"""
 
-@app.route('/view_journal')
-@login_required
-def view_journal():
-    year = int(request.args.get('year', datetime.now().year))
-    month = int(request.args.get('month', datetime.now().month))
 
-    # Get calendar information
-    cal = calendar.monthcalendar(year, month)
-    month_name = calendar.month_name[month]
-
-    # Get previous and next month links
-    prev_month = month - 1 if month > 1 else 12
-    prev_year = year if month > 1 else year - 1
-    next_month = month + 1 if month < 12 else 1
-    next_year = year if month < 12 else year + 1
-
-    # Get response data for the month
-    conn = sqlite3.connect('daily_tallies.db')
-    c = conn.cursor()
-
-    # Format dates properly for SQLite comparison
-    start_date = f"{year}-{month:02d}-01"
-    end_date = f"{year}-{month + 1:02d}-01" if month < 12 else f"{year + 1}-01-01"
-
-    c.execute("""
-        SELECT date, COUNT(DISTINCT prompt_number) as response_count,
-               (SELECT entry FROM journal_entries 
-                WHERE user_id = responses.user_id 
-                AND date = responses.date) as journal_entry
-        FROM responses 
-        WHERE user_id = ? AND date >= ? AND date < ?
-        GROUP BY date
-    """, (session['user_id'], start_date, end_date))
-
-    # Create a dictionary of dates with response counts and journal entries
-    response_data = {}
-    for row in c.fetchall():
-        date = row[0]
-        response_data[date] = {
-            'response_count': row[1],
-            'journal_entry': row[2] if row[2] else None
-        }
-
-    conn.close()
-
-    return render_template('view_journal.html',
-                           calendar=cal,
-                           month_name=month_name,
-                           year=year,
-                           month=month,
-                           prev_month=prev_month,
-                           prev_year=prev_year,
-                           next_month=next_month,
-                           next_year=next_year,
-                           response_data=response_data,
-                           current_date=datetime.now().strftime('%Y-%m-%d'))
 # Logout route
 @app.route('/logout')
 def logout():
