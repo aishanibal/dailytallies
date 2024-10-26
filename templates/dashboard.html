@@ -19,7 +19,7 @@
                             <div class="flex-shrink-0">
                                 <form method="POST" action="{{ url_for('submit_response') }}" class="inline">
                                     <input type="hidden" name="prompt_number" value="{{ number }}">
-                                    <input type="hidden" name="response" value="{% if response %}{% else %}completed{% endif %}">
+                                    <input type="hidden" name="response" value="{% if response %}{% else %}{{prompt}}{% endif %}">
                                     <input type="checkbox"
                                            id="prompt_{{ number }}"
                                            class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
