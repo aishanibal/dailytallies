@@ -3,32 +3,170 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import calendar
 import sqlite3
 import random
+import anthropic
 from functools import wraps
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import os
+import re
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Change this to a secure secret key
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+client = anthropic.Client(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-# Define prompt categories with example prompts
-PROMPT_CATEGORIES = {
-    "Nutrition": "Eat a red fruit today.",
-    "Exercise": "Do 20 jumping jacks.",
-    "Intellectual": "Recommend a news article.",
-    "Environment": "Go on a 5-minute walk outside, or watch the sunset.",
-    "Emotional": "Look into the mirror and tell yourself 'You got this!'"
-}
+
+def extract_tasks(claude_response):
+    """Extract numbered tasks from Claude's response"""
+    print("Raw Claude response:", claude_response)  # Debug print
+
+    try:
+        # Try to get the content directly if it's in the response
+        if isinstance(claude_response, dict) and 'content' in claude_response:
+            tasks_text = claude_response['content']
+        else:
+            tasks_text = str(claude_response)
+
+        print("Tasks text:", tasks_text)  # Debug print
+
+        # Look for tasks between tags or just numbered items if tags aren't found
+        tasks_match = re.search(r'<mental_health_tasks>(.*?)</mental_health_tasks>',
+                                tasks_text, re.DOTALL)
+
+        if tasks_match:
+            tasks_content = tasks_match.group(1).strip()
+        else:
+            tasks_content = tasks_text
+
+        print("Tasks content:", tasks_content)  # Debug print
+
+        # Try to extract tasks with brackets first
+        tasks = re.findall(r'\d+\.\s*\[(.*?)\]', tasks_content)
+
+        # If no bracketed tasks found, try without brackets
+        if not tasks:
+            tasks = re.findall(r'\d+\.\s*(.*?)(?=(?:\d+\.|$))', tasks_content, re.DOTALL)
+
+        # Clean up the tasks
+        tasks = [task.strip() for task in tasks if task.strip()]
+
+        print("Extracted tasks:", tasks)  # Debug print
+
+        return tasks
+    except Exception as e:
+        print(f"Error extracting tasks: {e}")  # Debug print
+        return []
+
+
+def get_daily_tasks(user_id):
+    """Get or generate daily tasks for the user"""
+    today = datetime.now().strftime('%Y-%m-%d')
+
+    # Include user_id in the session key to separate tasks per user
+    session_key = f'daily_tasks_{user_id}_{today}'
+
+    if session_key in session:
+        tasks = session[session_key]
+        if tasks:  # Only return if tasks exist
+            return tasks
+
+    # If not, generate new tasks
+    conn = sqlite3.connect('daily_tallies.db')
+    c = conn.cursor()
+
+    c.execute("""SELECT age_range, gender, employment_status, prompt_categories 
+                 FROM users WHERE id = ?""", (user_id,))
+    user_data = c.fetchone()
+    conn.close()
+
+    if user_data:
+        user_info = {
+            'age_range': user_data[0],
+            'gender': user_data[1],
+            'employment_status': user_data[2],
+            'prompt_categories': user_data[3].split(',') if user_data[3] else []
+        }
+
+        print(f"Generating tasks for user {user_id} with info:", user_info)  # Debug print
+
+        # Generate tasks using Claude
+        claude_response = generate_personalized_tasks(user_info)
+        tasks = extract_tasks(claude_response)
+
+        print(f"Generated tasks for user {user_id}:", tasks)  # Debug print
+
+        if tasks:
+            # Store in session with user-specific key
+            session[session_key] = tasks
+            return tasks
+        else:
+            print(f"No tasks were generated for user {user_id}")  # Debug print
+
+    return []
+
+
+def generate_personalized_tasks(user_info):
+    """Generate personalized tasks using Claude API"""
+    prompt = """You are an AI assistant tasked with generating personalized mental health tasks for users based on their demographic information and selected parameters. Generate exactly 5 specific, actionable tasks that can help boost the user's mental health.
+
+First, review the user's information:
+
+<user_info>
+Age: {age_range}
+Gender: {gender}
+Occupation: {employment_status}
+</user_info>
+
+Now, consider the parameters the user has selected as important for their mental health:
+
+<selected_parameters>
+{prompt_categories}
+</selected_parameters>
+
+Generate exactly 5 mental health tasks that are tailored to the user's profile and selected parameters. Each task should be specific, actionable, and designed to boost mental health.
+
+Your response must follow this exact format:
+
+<mental_health_tasks>
+1. [First specific, actionable task]
+2. [Second specific, actionable task]
+3. [Third specific, actionable task]
+4. [Fourth specific, actionable task]
+5. [Fifth specific, actionable task]
+</mental_health_tasks>"""
+
+    formatted_prompt = prompt.format(
+        age_range=user_info['age_range'],
+        gender=user_info['gender'],
+        employment_status=user_info['employment_status'],
+        prompt_categories=', '.join(user_info['prompt_categories'])
+    )
+
+    print("Sending prompt to Claude:", formatted_prompt)  # Debug print
+
+    try:
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1000,
+            temperature=0,
+            messages=[{
+                "role": "user",
+                "content": formatted_prompt
+            }]
+        )
+
+        return message.content
+    except Exception as e:
+        print(f"Error calling Claude API: {e}")  # Debug print
+        return None
+
 
 # Database initialization
 def init_db():
     conn = sqlite3.connect('daily_tallies.db')
     c = conn.cursor()
 
-    #for row in rows:
-      #  print(row)
-
-
-
-    # Create users and responses tables if they don't exist
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   username TEXT UNIQUE NOT NULL,
@@ -47,12 +185,11 @@ def init_db():
                   FOREIGN KEY (user_id) REFERENCES users (id))''')
 
     c.execute('''CREATE TABLE IF NOT EXISTS journal_entries
-                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                      user_id INTEGER,
-                      date TEXT,
-                      entry TEXT,
-                      FOREIGN KEY (user_id) REFERENCES users (id))''')
-    # Other initialization code...
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER,
+                  date TEXT,
+                  entry TEXT,
+                  FOREIGN KEY (user_id) REFERENCES users (id))''')
 
     conn.commit()
     conn.close()
@@ -71,12 +208,49 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+@app.route('/generate_tasks')
+@login_required
+def generate_tasks():
+    conn = sqlite3.connect('daily_tallies.db')
+    c = conn.cursor()
+
+    # Fetch user information
+    c.execute("""SELECT age_range, gender, employment_status, prompt_categories 
+                 FROM users WHERE id = ?""", (session['user_id'],))
+    user_data = c.fetchone()
+    conn.close()
+
+    if user_data:
+        user_info = {
+            'age_range': user_data[0],
+            'gender': user_data[1],
+            'employment_status': user_data[2],
+            'prompt_categories': user_data[3].split(',') if user_data[3] else []
+        }
+
+        # Generate personalized tasks using Claude
+        tasks = generate_personalized_tasks(user_info)
+
+        return render_template('personalized_tasks.html', tasks=tasks)
+
+    flash('Unable to generate personalized tasks. Please complete your profile.')
+    return redirect(url_for('dashboard'))
+
 @app.route('/')
 def index():
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
     return render_template('index.html')
 
+
+PROMPT_CATEGORIES = {
+    "Nutrition": "Eat a red fruit today.",
+    "Exercise": "Do 20 jumping jacks.",
+    "Intellectual": "Recommend a news article.",
+    "Environment": "Go on a 5-minute walk outside, or watch the sunset.",
+    "Emotional": "Look into the mirror and tell yourself 'You got this!'"
+}
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -164,22 +338,19 @@ def submit_journal():
 
 
 # Dashboard route
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
     today = datetime.now().strftime('%Y-%m-%d')
+
+    # Get today's tasks
+    tasks = get_daily_tasks(session['user_id'])
+    print("Tasks for dashboard:", tasks)  # Debug print
+
+    # Get responses from database
     conn = sqlite3.connect('daily_tallies.db')
     c = conn.cursor()
-
-    # Retrieve user's selected categories
-    c.execute("SELECT prompt_categories FROM users WHERE id = ?", (session['user_id'],))
-    user_categories = c.fetchone()[0]
-    if user_categories:
-        user_categories = user_categories.split(',')
-    else:
-        user_categories = []
-
-    # Get today's responses
     c.execute("""SELECT prompt_number, response 
                  FROM responses 
                  WHERE user_id = ? AND date = ?""",
@@ -187,16 +358,20 @@ def dashboard():
     responses = dict(c.fetchall())
     conn.close()
 
-    # Filter prompts based on user-selected categories
+    # Combine tasks with their responses
     prompts_and_responses = []
-    for i, (category, prompt) in enumerate(PROMPT_CATEGORIES.items(), 1):
-        if category in user_categories:
-            response = responses.get(i, '')
-            prompts_and_responses.append((i, prompt, response))
+    for i, task in enumerate(tasks, 1):
+        response = responses.get(i, '')
+        prompts_and_responses.append((i, task, response))
+
+    print("Final prompts and responses:", prompts_and_responses)  # Debug print
 
     return render_template('dashboard.html',
                            prompts_and_responses=prompts_and_responses,
                            date=today)
+
+
+
 
 # Submit response route
 @app.route('/submit_response', methods=['POST'])
@@ -209,35 +384,35 @@ def submit_response():
     conn = sqlite3.connect('daily_tallies.db')
     c = conn.cursor()
 
-    # Insert or update the response
-    c.execute("""INSERT OR REPLACE INTO responses 
-                 (user_id, date, prompt_number, response)
-                 VALUES (?, ?, ?, ?)""",
-              (session['user_id'], today, prompt_number, response))
+    # Check if a response already exists
+    c.execute("""SELECT id FROM responses 
+                 WHERE user_id = ? AND date = ? AND prompt_number = ?""",
+              (session['user_id'], today, prompt_number))
+    existing = c.fetchone()
+
+    if existing:
+        if response:  # If marking as complete
+            c.execute("""UPDATE responses 
+                        SET response = ? 
+                        WHERE user_id = ? AND date = ? AND prompt_number = ?""",
+                      (response, session['user_id'], today, prompt_number))
+        else:  # If unmarking/removing completion
+            c.execute("""DELETE FROM responses 
+                        WHERE user_id = ? AND date = ? AND prompt_number = ?""",
+                      (session['user_id'], today, prompt_number))
+    else:
+        if response:  # Only insert if marking as complete
+            c.execute("""INSERT INTO responses (user_id, date, prompt_number, response)
+                        VALUES (?, ?, ?, ?)""",
+                      (session['user_id'], today, prompt_number, response))
+
     conn.commit()
     conn.close()
 
-    flash('Response saved successfully!')
     return redirect(url_for('dashboard'))
 
-"""
-@app.route('/view_journal')
-@login_required
-def view_journal():
-    conn = sqlite3.connect('daily_tallies.db')
-    c = conn.cursor()
 
-    # Fetch all journal entries for the logged-in user
-    c.execute(SELECT date, entry FROM journal_entries WHERE user_id = ? ORDER BY date DESC,
-              (session['user_id'],))
-    journal_entries = c.fetchall()
-    conn.close()
 
-    # Convert entries to a dictionary for easier access in the template
-    entries_by_date = {entry[0]: entry[1] for entry in journal_entries}
-
-    return render_template('view_journal.html', entries_by_date=entries_by_date)
-"""
 
 @app.route('/view_journal')
 @login_required
