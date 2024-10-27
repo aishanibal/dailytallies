@@ -319,7 +319,6 @@ def login():
 
         if user and check_password_hash(user[2], password):  # Adjust index for the 'password' column
             session['user_id'] = user[0]
-            flash('Login successful!')
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password!')
