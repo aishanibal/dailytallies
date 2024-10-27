@@ -6,18 +6,18 @@
     <!-- Calendar Navigation -->
     <div class="flex justify-between items-center mb-4">
         <a href="{{ url_for('view_journal', year=prev_year, month=prev_month) }}"
-           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+           class="custom-button text-white font-bold py-2 px-4 rounded">
             previous month
         </a>
         <h2 class="text-2xl font-bold text-center">{{ month_name }} {{ year }}</h2>
         <a href="{{ url_for('view_journal', year=next_year, month=next_month) }}"
-           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+           class="custom-button1 text-white font-bold py-2 px-4 rounded">
             next month
         </a>
     </div>
 
     <!-- Calendar Grid -->
-    <table class="w-full border-collapse table-fixed">
+    <table style="border-radius:10px;" class="w-full border-collapse table-fixed custom-input">
         <thead>
             <tr>
                 {% for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
@@ -61,7 +61,7 @@
         <div class="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="modalDate" class="text-xl font-bold"></h3>
-                <button onclick="closeJournalModal()" class="text-gray-600 hover:text-gray-800">
+                <button onclick="closeJournalModal()" class="text-gray-600 hover:text-gray-800 custom-button">
                     <span class="text-2xl">&times;</span>
                 </button>
             </div>
@@ -74,11 +74,11 @@
         <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
             <h3 id="modalDateTitle" class="text-xl font-bold mb-4"></h3>
             <div id="buttonContainer" class="flex flex-col space-y-2">
-                <button id="journalEntryButton" class="text-blue-500 underline">View Journal Entry</button>
+                <button id="journalEntryButton" class="text-blue-500 underline custom-button">View Journal Entry</button>
                 <!-- Dynamic buttons for prompts will be added here -->
             </div>
             <div class="flex justify-end mt-4">
-                <button onclick="closeButtonModal()" class="text-gray-600 hover:text-gray-800">
+                <button onclick="closeButtonModal()" class="text-gray-600 hover:text-gray-800 custom-button">
                     <span class="text-lg">&times;</span>
                 </button>
             </div>

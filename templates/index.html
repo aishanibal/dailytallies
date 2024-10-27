@@ -5,18 +5,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
 </head>
 <body class="bg-gray-100">
 <nav class="bg-blue-500 p-4 text-white shadow md" style="background-color: #D4EBED; color: #689689;">
@@ -24,25 +12,25 @@
             <img src="{{ url_for('static', filename='images/daily_name.png') }}" class="h-14 w-25"  alt="Daily Tallies Logo">
         </div>
 </nav>
-    <div class="main-container">
+    <div class="main-container mx-auto px-8 lg:px-16 py-8">
         <div class="content-section">
 
             <div class="welcome-card">
-                <h2 class="text-2xl font-semibold mb-4">Introducing Daily Tallies</h2>
+                <h2 class="text-2xl font-semibold mb-4">Introducing Daily Tallies! </h2>
                 <p class="mb-6 text-gray-600">Your interactive everyday to-do list! Powered by Anthropic, Daily Tallies supports a mindful lifestyle with personalized AI prompts, progress tracking, and daily journaling.
                 <br> <br>
-                    Get started?
+                    Start tallying today?
                 </p>
                 <div class="flex justify-center space-x-4">
-                    <a href="{{ url_for('login') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Login</a>
-                    <a href="{{ url_for('register') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</a>
+                    <a href="{{ url_for('login') }}" class="custom-button text-white px-4 py-2 rounded">Login</a>
+                    <a href="{{ url_for('register') }}" class="custom-button1 text-white px-4 py-2 rounded">Register</a>
                 </div>
             </div>
         </div>
 
         <div class="graphic-section">
             <img src="{{ url_for('static', filename='images/index-graphic.jpg') }}"
-                 alt="Decorative illustration">
+                 alt="Decorative illustration" style="border-radius: 5%;">
         </div>
     </div>
 </body>

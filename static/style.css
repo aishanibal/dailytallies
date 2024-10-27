@@ -9,14 +9,41 @@
     src: url("sans.otf")
 }
 
+@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+ @keyframes scaleIn {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.02);
+            }
+        }
+
+
 h1, h2, h3, h4, h5, h6, label.block, a, button {
     font-family: 'font1'; /* Set a custom font */
     color: #689689;
 }
 
-input[type="checkbox"]{
+.custom-check{
     accent-color: #6181A2;
     font-family: 'font2';
+    color: #78859B;
+}
+
+.custom-input, p{
+    font-family: 'font2';
+    color: #78859B;
 }
 
 .strike-checkbox:checked{
@@ -24,22 +51,22 @@ input[type="checkbox"]{
     text-decoration: line-through;
 }
 
-a.bg-blue-500, button.bg-blue-500{
-    background-color: #6181A2;
+a.bg-blue-500, .custom-button{
+    background-color: #6EA6C9;
     border-radius: 999px;
 }
 
-a.bg-green-500, button.bg-green-500{
-    background-color: #A9CDCD;
+a.bg-green-500, button.bg-green-500, .custom-button1{
+    background-color: #96C5B9;
     border-radius: 999px;
 }
 
-a.bg-green-600, button.bg-green-600{
-    background-color: #D4EBED;
+a.bg-green-600,.custom-button1:hover{
+    background-color: #A3D3C7;
 }
 
-a.bg-blue-600, button.bg-blue-600{
-    background-color: #9eb3ca;
+a.bg-blue-600, .custom-button:hover{
+    background-color: #98D1F5;
 }
 
 body.bg-gray-100{
@@ -53,25 +80,27 @@ body.bg-gray-100{
     --custom-accent-color: #e74c3c; /* Example accent color */
 }
 
-button {
-    background-color: #A9CDCD !important;
+.button {
+    background-color: #6181A2 !important;
     color: #fff !important;
     padding: 0.5rem 1rem;
     border-radius: 9999px;
     font-weight: bold;
-    text-transform: uppercase;
 }
+
   /* Layout containers */
 .main-container {
     width: 100%;
     min-height: calc(100vh - 72px);
     display: flex;
     overflow: hidden;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 /* Content sections */
 .content-section {
-    padding: 4rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -84,7 +113,6 @@ button {
     flex-shrink: 0;
     position: relative;
     width: 60%;
-    flex-shrink: 0;
     padding: 4rem;
     align-items: center;
     justify-content: center;
