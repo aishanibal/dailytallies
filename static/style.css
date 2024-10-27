@@ -4,6 +4,11 @@
     src: url("Holen Vintage.otf")
 }
 
+@font-face {
+    font-family: font2;
+    src: url("sans.otf")
+}
+
 h1, h2, h3, h4, h5, h6, label.block, a, button {
     font-family: 'font1'; /* Set a custom font */
     color: #689689;
@@ -11,7 +16,7 @@ h1, h2, h3, h4, h5, h6, label.block, a, button {
 
 input[type="checkbox"]{
     accent-color: #6181A2;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'font2';
 }
 
 .strike-checkbox:checked{
@@ -122,7 +127,7 @@ img.max-w-full{
 }
 
 /* Additional Tailwind overrides for spacing, border-radius, etc. */
-.mt-4 {
+.mt-2 {
     margin-top: 1rem !important;
 }
 .mb-4 {
