@@ -4,9 +4,19 @@
     src: url("Holen Vintage.otf")
 }
 
-h1, h2, h3, h4, h5, h6, a, button {
+h1, h2, h3, h4, h5, h6, label.block, a, button {
     font-family: 'font1'; /* Set a custom font */
     color: #689689;
+}
+
+input[type="checkbox"]{
+    accent-color: #6181A2;
+    font-family: 'Roboto', sans-serif;
+}
+
+.strike-checkbox:checked{
+    color: white;
+    text-decoration: line-through;
 }
 
 a.bg-blue-500, button.bg-blue-500{
@@ -56,13 +66,14 @@ button {
 
 /* Content sections */
 .content-section {
-    padding: 2rem;
+    padding: 4rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 40%;
     flex-shrink: 0;
 }
+
 
 .graphic-section {
     flex-shrink: 0;

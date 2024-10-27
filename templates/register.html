@@ -76,8 +76,9 @@
         <label class="block text-gray-700">Select Areas for Improvement:</label>
         {% for category, example in prompt_categories.items() %}
             <div class="flex items-center">
-                <input type="checkbox" name="prompt_categories" value="{{ category }}" class="mr-2">
-                <label>{{ category }} </label>
+                <label>
+                    <input type="checkbox" name="prompt_categories" value="{{ category }}" class="cursor-pointer mr-2">
+                {{ category }} </label>
             </div>
         {% endfor %}
     </div>
