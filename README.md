@@ -1,4 +1,4 @@
-Daily Tallies 🎯
+#Daily Tallies 🎯
 Daily Tallies is an AI-powered habit formation app that helps you build and maintain quality habits through personalized, adaptive prompts. The app learns from your interactions and adjusts its suggestions to maximize your success in building lasting positive routines.
 Features ✨
 
