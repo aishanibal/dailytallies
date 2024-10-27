@@ -166,6 +166,78 @@ def submit_journal():
                   (session['user_id'], today, journal_entry))
 
     conn.commit()
+<<<<<<< Updated upstream
+=======
+
+    # Check which tasks have been completed
+    c.execute("""SELECT prompt_number, response FROM responses 
+                 WHERE user_id = ? AND date = ? AND response != ''""",
+              (session['user_id'], today))
+    completed_tasks = [row[1] for row in c.fetchall()]
+
+    if completed_tasks:
+        # Fetch user data for prompt categories
+        c.execute("""SELECT age_range, gender, employment_status, prompt_categories
+                     FROM users WHERE id = ?""", (session['user_id'],))
+        user_data = c.fetchone()
+
+        user_info = {
+            'age_range': user_data[0],
+            'gender': user_data[1],
+            'employment_status': user_data[2],
+            'prompt_categories': user_data[3].split(',') if user_data[3] else []
+        }
+
+        # Prepare Claude prompt with journal entry and completed tasks
+        claude_prompt = f"""
+        You are an AI assistant generating mental health tasks for users based on their profile and recent activities.
+
+        User Information:
+        Age: {user_info['age_range']}
+        Gender: {user_info['gender']}
+        Occupation: {user_info['employment_status']}
+        Selected Parameters: {', '.join(user_info['prompt_categories'])}
+
+        The user has completed the following tasks:
+        {', '.join(completed_tasks)}
+
+        Additionally, here is their latest journal entry:
+        "{journal_entry}"
+
+        Based on this information, generate exactly 5 new mental health tasks that are specific, actionable, and designed to help the user continue their mental health journey.
+        These prompts should be around 10-15 words, and avoid extreme specificity in the prompts. 
+ 
+        Your response must follow this exact format:
+
+        <mental_health_tasks>
+        1. [First specific, actionable task]
+        2. [Second specific, actionable task]
+        3. [Third specific, actionable task]
+        4. [Fourth specific, actionable task]
+        5. [Fifth specific, actionable task]
+        </mental_health_tasks>
+        """
+
+        print("Sending combined prompt to Claude:", claude_prompt)  # Debug print
+
+        # Generate a new set of tasks
+        claude_response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1000,
+            temperature=0,
+            messages=[{
+                "role": "user",
+                "content": claude_prompt
+            }]
+        )
+        new_tasks = extract_tasks(claude_response)
+
+        if new_tasks:
+            # Store new tasks for the next day in session
+            session[next_day_session_key] = new_tasks
+            print("Next day's tasks set in session:", session[next_day_session_key])  # Debug print
+
+>>>>>>> Stashed changes
     conn.close()
 
     flash('Journal entry saved successfully!')

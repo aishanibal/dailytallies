@@ -92,7 +92,7 @@ let currentJournalEntry = '';
 
 function showButtonModal(date) {
     currentDate = date;
-    document.getElementById('modalDateTitle').textContent = `options for ${date}`;
+    document.getElementById('modalDateTitle').textContent = `${date}`;
     const buttonContainer = document.getElementById('buttonContainer');
     buttonContainer.innerHTML = ''; // Clear previous buttons
 
@@ -116,7 +116,7 @@ function showButtonModal(date) {
         if (prompts && prompts.length > 0) {
             prompts.forEach((task, index) => {
                 const promptButton = document.createElement('button');
-                promptButton.textContent = `prompt ${index + 1}`;
+                promptButton.textContent = `Completed tally ${index + 1}`;
                 promptButton.className = 'text-blue-500 underline';
                 promptButton.onclick = function() {
                     closeButtonModal();
