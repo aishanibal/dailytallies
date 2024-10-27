@@ -135,7 +135,7 @@ Now, consider the parameters the user has selected as important for their mental
 </selected_parameters>
 
 Generate exactly 5 mental health tasks that are tailored to the user's profile and selected parameters. Each task should be specific, actionable, and designed to boost mental health.
-These prompts should be around 10-15 words, and avoid extreme specificity in the prompts. 
+These prompts should be around less than 10 words, and avoid extreme specificity in the prompts. Prompts should be able to be completed within a day.
 Your response must follow this exact format:
 
 <mental_health_tasks>
@@ -178,11 +178,11 @@ def init_db():
     c = conn.cursor()
 
     # Execute and fetch query results
-    c.execute("SELECT * FROM users")
-    rows = c.fetchall()
+    #c.execute("SELECT * FROM users")
+    #rows = c.fetchall()
 
-    for row in rows:
-        print(row)
+    #for row in rows:
+        #print(row)
 
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
