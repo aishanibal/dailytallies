@@ -31,17 +31,43 @@
                 {% for day in week %}
                 {% if day != 0 %}
                 {% set date = '%04d-%02d-%02d'|format(year, month, day) %}
-                <td class="border p-4 h-32 align-top  {% if date == current_date %}bg-blue-100{% endif %}">
+                <td class="border p-4 h-32 align-top {% if date == current_date %}bg-blue-100{% endif %}">
                     <div class="flex justify-between"> <span class="font-bold">{{ day }}</span> </div>
-                    {% if date in response_data and response_data[date]['journal_entry'] %}
+
+                    <!-- Display Tasks -->
+
+                    {% if date in response_data and response_data[date]['completed_tasks'] %}
 
                     <div class="mt-2 text-sm">
-                        <div class="journal-entry overflow-y-auto max-h-24">
-                            {{ response_data[date]['journal_entry']|safe }}
+
+                        {% set num_completed_tasks = response_data[date]['completed_tasks'] | length %}
+                        <div class="mb-8">
+                            <img src="{{ url_for('static', filename='images/tally_' + num_completed_tasks|string + '.png') }}" alt="Tally Image" class="w-32 h-32 object-cover">
                         </div>
+                        <ul class="list-disc pl-4">
+                            {% for task in response_data[date]['completed_tasks'] %}
+                            <li class="{% if task.completed %}line-through text-gray-500{% endif %}">
+
+                                <!-- Button to show full prompt text if it overflows -->
+                                {% if task[1] | length > 50 %} {# Adjust length as needed #}
+                                    <button onclick="showPromptModal('{{ date|e }}', '{{ task[1]|e }}')"
+                                            class="text-blue-500 underline text-xs ml-2">
+                                        Read More
+                                    </button>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                    </div>
+                    {% endif %}
+
+                    <!-- Display Journal Entry -->
+                    {% if date in response_data and response_data[date]['journal_entry'] %}
+                    <div class="mt-2 text-sm">
                         <button onclick="showJournalModal('{{ date|e }}', '{{ response_data[date]['journal_entry']|e }}')"
                                 class="text-blue-500 underline">
-                            Read More
+                            Journal Entry
                         </button>
                     </div>
                     {% endif %}
@@ -55,7 +81,7 @@
         </tbody>
     </table>
 
-    <!-- Journal Entry Modal -->
+    <!-- Journal and Prompt Entry Modal -->
     <div id="journalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
             <div class="flex justify-between items-center mb-4">
@@ -73,6 +99,12 @@
 function showJournalModal(date, content) {
     document.getElementById('modalDate').textContent = date;
     document.getElementById('modalContent').innerHTML = content;
+    document.getElementById('journalModal').classList.remove('hidden');
+}
+
+function showPromptModal(date, content) {
+    document.getElementById('modalDate').textContent = `Prompt for ${date}`;
+    document.getElementById('modalContent').textContent = content;
     document.getElementById('journalModal').classList.remove('hidden');
 }
 

@@ -1,0 +1,128 @@
+/* Override Tailwind font styles */
+body, h1, h2, h3, h4, h5, h6, p, a, button {
+    font-family: 'Roboto', sans-serif; /* Set a custom font */
+}
+
+body.bg-gray-100{
+    background-color: #ffffff;
+}
+
+/* Custom color overrides */
+:root {
+    --custom-primary-color: #3498db; /* Example primary color */
+    --custom-secondary-color: #2ecc71; /* Example secondary color */
+    --custom-accent-color: #e74c3c; /* Example accent color */
+}
+
+/* Override Tailwind color classes */
+.text-primary {
+    color: var(--custom-primary-color) !important;
+}
+.text-secondary {
+    color: var(--custom-secondary-color) !important;
+}
+.text-accent {
+    color: var(--custom-accent-color) !important;
+}
+
+/* Override Tailwind background colors */
+.bg-primary {
+    background-color: var(--custom-primary-color) !important;
+}
+.bg-secondary {
+    background-color: var(--custom-secondary-color) !important;
+}
+.bg-accent {
+    background-color: var(--custom-accent-color) !important;
+}
+
+/* Override Tailwind button styles */
+button {
+    background-color: var(--custom-primary-color) !important;
+    color: #fff !important;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+  /* Layout containers */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    padding: 2rem;
+}
+
+/* Content sections */
+.content-section {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.graphic-section {
+    flex-grow: 0.5;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img.max-w-full{
+    width: 500px;
+    height: 300px;
+}
+
+/* Logo styling */
+.logo {
+    height: 3.5rem;
+    width: auto;
+    margin-bottom: 2rem;
+}
+
+/* Welcome card */
+.welcome-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Override Tailwind container padding */
+.container {
+    padding: 1rem !important;
+    max-width: 90% !important;
+}
+
+/* Additional Tailwind overrides for spacing, border-radius, etc. */
+.mt-4 {
+    margin-top: 1rem !important;
+}
+.mb-4 {
+    margin-bottom: 1rem !important;
+}
+
+.rounded-lg {
+    border-radius: 12px !important;
+}
+
+
+/* Override background color for the nav */
+nav.bg-blue-500 {
+    background-color: #D4EBED !important; /* Custom background color */
+}
+
+/* Override text color for the nav links */
+nav.bg-blue-500 a {
+    color: #689689 !important; /* Custom text color */
+    font-size: 20px;
+}
+
+/* Hover color override */
+nav.bg-blue-500 a:hover {
+    color: #ffffff !important; /* Custom hover color */
+}
