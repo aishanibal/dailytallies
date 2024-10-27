@@ -443,7 +443,6 @@ def submit_journal():
 
     conn.close()
 
-    flash('Journal entry saved successfully! Your tasks for tomorrow have been generated.')
     return redirect(url_for('dashboard'))
 
 
