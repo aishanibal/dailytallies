@@ -135,7 +135,7 @@ Now, consider the parameters the user has selected as important for their mental
 </selected_parameters>
 
 Generate exactly 5 mental health tasks that are tailored to the user's profile and selected parameters. Each task should be specific, actionable, and designed to boost mental health.
-These prompts should be around 10-15 words
+These prompts should be around 10-15 words, and avoid extreme specificity in the prompts. 
 Your response must follow this exact format:
 
 <mental_health_tasks>
@@ -409,7 +409,7 @@ def submit_journal():
         "{journal_entry}"
 
         Based on this information, generate exactly 5 new mental health tasks that are specific, actionable, and designed to help the user continue their mental health journey.
-        These prompts should be around 10-15 words
+        These prompts should be around 10-15 words, and avoid extreme specificity in the prompts. 
 
         Your response must follow this exact format:
 
