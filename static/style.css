@@ -54,11 +54,13 @@ h1, h2, h3, h4, h5, h6, label.block, a, button {
 a.bg-blue-500, .custom-button{
     background-color: #6EA6C9;
     border-radius: 999px;
+    color: white;
 }
 
 a.bg-green-500, button.bg-green-500, .custom-button1{
     background-color: #96C5B9;
     border-radius: 999px;
+    color:white;
 }
 
 a.bg-green-600,.custom-button1:hover{

@@ -61,7 +61,7 @@
         <div class="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="modalDate" class="text-xl font-bold"></h3>
-                <button onclick="closeJournalModal()" class="text-gray-600 hover:text-gray-800 custom-button">
+                <button onclick="closeJournalModal()" class="custom-button1 w-8 h-8 rounded-full flex items-center justify-center p-0">
                     <span class="text-2xl">&times;</span>
                 </button>
             </div>
@@ -74,11 +74,11 @@
         <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
             <h3 id="modalDateTitle" class="text-xl font-bold mb-4"></h3>
             <div id="buttonContainer" class="flex flex-col space-y-2">
-                <button id="journalEntryButton" class="text-blue-500 underline custom-button">View Journal Entry</button>
+                <button id="journalEntryButton" class="custom-button1">View Journal Entry</button>
                 <!-- Dynamic buttons for prompts will be added here -->
             </div>
             <div class="flex justify-end mt-4">
-                <button onclick="closeButtonModal()" class="text-gray-600 hover:text-gray-800 custom-button">
+                <button onclick="closeButtonModal()" class="custom-button1 w-8 h-8 rounded-full flex items-center justify-center p-0">
                     <span class="text-lg">&times;</span>
                 </button>
             </div>
@@ -103,8 +103,8 @@ function showButtonModal(date) {
 
         // Add journal entry button
         const journalEntryButton = document.createElement('button');
-        journalEntryButton.textContent = 'view journal entry';
-        journalEntryButton.className = 'text-blue-500 underline';
+        journalEntryButton.textContent = 'journal entry';
+        journalEntryButton.className = 'custom-button1';
         journalEntryButton.onclick = function() {
             closeButtonModal();
             showJournalModal(date, currentJournalEntry);
@@ -116,8 +116,8 @@ function showButtonModal(date) {
         if (prompts && prompts.length > 0) {
             prompts.forEach((task, index) => {
                 const promptButton = document.createElement('button');
-                promptButton.textContent = `Completed tally ${index + 1}`;
-                promptButton.className = 'text-blue-500 underline';
+                promptButton.textContent = `completed tally ${index + 1}`;
+                promptButton.className = 'custom-button1 text-white-500';
                 promptButton.onclick = function() {
                     closeButtonModal();
                     showPromptModal(date, task[1]);
@@ -157,4 +157,29 @@ document.getElementById('journalModal').addEventListener('click', function(e) {
     }
 });
 </script>
+<style>
+.btn {
+    background-color: #689689; /* Bootstrap primary color */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-flex; /* Use inline-flex for icon and text alignment */
+    align-items: center; /* Center icon and text vertically */
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #87c6b2; /* Darker shade on hover */
+}
+
+.btn i {
+    margin-right: 8px; /* Spacing between icon and text */
+}
+</style>
+<div style="text-align: center;">
+    <a href="{{ url_for('export_journal', user_id=current_user_id) }}" class="btn btn-primary flex items-center">
+        Export Journal Entries
+    </a>
+</div>
 {% endblock %}
