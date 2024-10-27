@@ -4,6 +4,7 @@
 {% block title %}Journal{% endblock %}
 
 {% block content %}
+<div class="container mx-auto px-4 py-8">
 <h1 class="text-4xl font-bold mb-8">Journal</h1>
 
 <form action="{{ url_for('submit_journal') }}" method="POST" class="space-y-4">
@@ -13,4 +14,5 @@
     </div>
     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Entry</button>
 </form>
+</div>
 {% endblock %}

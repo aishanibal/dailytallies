@@ -262,8 +262,8 @@ def index():
 
 PROMPT_CATEGORIES = {
     "Nutrition": "Eat a red fruit today.",
-    "Exercise": "Do 20 jumping jacks.",
-    "Intellectual": "Recommend a news article.",
+    "Fitness": "Do 20 jumping jacks.",
+    "Knowledge": "Recommend a news article.",
     "Environment": "Go on a 5-minute walk outside, or watch the sunset.",
     "Emotional": "Look into the mirror and tell yourself 'You got this!'"
 }

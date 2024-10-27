@@ -1,6 +1,24 @@
 /* Override Tailwind font styles */
-body, h1, h2, h3, h4, h5, h6, p, a, button {
-    font-family: 'Roboto', sans-serif; /* Set a custom font */
+@font-face {
+    font-family: font1;
+    src: url("Holen Vintage.otf")
+}
+
+h1, h2, h3, h4, h5, h6, a, button {
+    font-family: 'font1'; /* Set a custom font */
+    color: #689689;
+}
+
+a.bg-blue-500{
+    background-color: #6181A2;
+}
+
+a.bg-green-500{
+    background-color: #A9CDCD;
+}
+
+a.bg-green-500.hover, a.bg-blue-500.hover{
+    background-color: #D4EBED;
 }
 
 body.bg-gray-100{
@@ -14,62 +32,47 @@ body.bg-gray-100{
     --custom-accent-color: #e74c3c; /* Example accent color */
 }
 
-/* Override Tailwind color classes */
-.text-primary {
-    color: var(--custom-primary-color) !important;
-}
-.text-secondary {
-    color: var(--custom-secondary-color) !important;
-}
-.text-accent {
-    color: var(--custom-accent-color) !important;
-}
-
-/* Override Tailwind background colors */
-.bg-primary {
-    background-color: var(--custom-primary-color) !important;
-}
-.bg-secondary {
-    background-color: var(--custom-secondary-color) !important;
-}
-.bg-accent {
-    background-color: var(--custom-accent-color) !important;
-}
-
-/* Override Tailwind button styles */
 button {
-    background-color: var(--custom-primary-color) !important;
+    background-color: #A9CDCD !important;
     color: #fff !important;
     padding: 0.5rem 1rem;
-    border-radius: 4px;
+    border-radius: 60px;
     font-weight: bold;
     text-transform: uppercase;
 }
   /* Layout containers */
 .main-container {
-    max-width: 1200px;
-    margin: 0 auto;
     width: 100%;
-    min-height: 100vh;
+    min-height: calc(100vh - 72px);
     display: flex;
-    padding: 2rem;
+    overflow: hidden;
 }
 
 /* Content sections */
 .content-section {
-    flex: 1;
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    justify-content: center;
+    width: 40%;
+    flex-shrink: 0;
 }
 
 .graphic-section {
-    flex-grow: 0.5;
+    flex-shrink: 0;
     position: relative;
-    display: flex;
+    width: 60%;
+    flex-shrink: 0;
+    padding: 4rem;
     align-items: center;
     justify-content: center;
+}
+
+.graphic-section img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 img.max-w-full{
@@ -90,6 +93,7 @@ img.max-w-full{
     border-radius: 0.75rem;
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
 }
 
 /* Override Tailwind container padding */
