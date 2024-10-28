@@ -73,14 +73,16 @@
 
     <!-- Prompt categories selection as checkboxes -->
     <div>
-        <label class="block text-gray-700">Select Prompt Categories:</label>
+        <label class="block text-gray-700">Select Areas for Improvement:</label>
         {% for category, example in prompt_categories.items() %}
             <div class="flex items-center">
                 <input type="checkbox" name="prompt_categories" value="{{ category }}" class="mr-2">
-                <label>{{ category }} <small>(Ex: {{ example }})</small></label>
+                <label>{{ category }} </label>
             </div>
         {% endfor %}
     </div>
 
     <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</button>
 </form>
+        </div>
+    </div>
