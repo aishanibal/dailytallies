@@ -175,6 +175,13 @@ def init_db():
     conn = sqlite3.connect('daily_tallies.db')
     c = conn.cursor()
 
+    # Execute and fetch query results
+   # c.execute("SELECT * FROM responses")
+   # rows = c.fetchall()
+
+    #for row in rows:
+     #   print(row)
+
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   username TEXT UNIQUE NOT NULL,
@@ -190,6 +197,7 @@ def init_db():
                   date TEXT,
                   prompt_number INTEGER,
                   response TEXT,
+                  completed BOOLEAN DEFAULT 0,
                   FOREIGN KEY (user_id) REFERENCES users (id))''')
 
     c.execute('''CREATE TABLE IF NOT EXISTS journal_entries
@@ -471,7 +479,7 @@ def submit_response():
     if existing:
         if response:  # If marking as complete
             c.execute("""UPDATE responses
-                        SET response = ?
+                        SET response = ?, completed = 1
                         WHERE user_id = ? AND date = ? AND prompt_number = ?""",
                       (response, session['user_id'], today, prompt_number))
         else:  # If unmarking/removing completion
@@ -480,8 +488,8 @@ def submit_response():
                       (session['user_id'], today, prompt_number))
     else:
         if response:  # Only insert if marking as complete
-            c.execute("""INSERT INTO responses (user_id, date, prompt_number, response)
-                        VALUES (?, ?, ?, ?)""",
+            c.execute("""INSERT INTO responses (user_id, date, prompt_number, response, completed)
+                        VALUES (?, ?, ?, ?, 1)""",
                       (session['user_id'], today, prompt_number, response))
 
     conn.commit()
@@ -490,12 +498,9 @@ def submit_response():
     return redirect(url_for('dashboard'))
 
 
-
-
 @app.route('/view_journal')
 @login_required
 def view_journal():
-    print("hellofds")
     year = int(request.args.get('year', datetime.now().year))
     month = int(request.args.get('month', datetime.now().month))
 
@@ -509,44 +514,50 @@ def view_journal():
     next_month = month + 1 if month < 12 else 1
     next_year = year if month < 12 else year + 1
 
-    # Get response data for the month
-    conn = sqlite3.connect('daily_tallies.db')
-    c = conn.cursor()
-
     # Format dates properly for SQLite comparison
     start_date = f"{year}-{month:02d}-01"
     end_date = f"{year}-{month + 1:02d}-01" if month < 12 else f"{year + 1}-01-01"
 
+    conn = sqlite3.connect('daily_tallies.db')
+    c = conn.cursor()
+
+    # Get journal entries
     c.execute("""
-        SELECT date,
-               COUNT(DISTINCT journal_entries.id) AS entry_count,
-               journal_entries.entry AS journal_entry
+        SELECT date, entry
         FROM journal_entries
-        JOIN users ON users.id = journal_entries.user_id
-        WHERE users.id = ?
-          AND date >= ?
-          AND date < ?
-        GROUP BY date
+        WHERE user_id = ? AND date >= ? AND date < ?
     """, (session['user_id'], start_date, end_date))
 
-    rows = c.fetchall()
-    print(rows)
+    journal_entries = c.fetchall()
 
-    # Print each row in the table
-    for row in rows:
-        print("SDKJf")
-        print(row)
-    print("\n" + "-" * 40 + "\n")  # Separator between tables
+    # Get completed responses for the month
+    c.execute("""
+        SELECT date, prompt_number, response
+        FROM responses
+        WHERE user_id = ? AND date >= ? AND date < ? AND completed = 1
+    """, (session['user_id'], start_date, end_date))
 
-    # Create a dictionary of dates with response counts and journal entries
-    response_data = {}
-    for row in rows:
-        date = row[0]
-        response_data[date] = {
-            'journal_entry': row[2] if row[2] else None
-        }
+    completed_prompts = c.fetchall()
 
     conn.close()
+
+    # Combine journal entries and completed prompts into a dictionary for rendering
+    response_data = {}
+
+    for date, entry in journal_entries:
+        response_data[date] = {
+            'journal_entry': entry,
+            'completed_tasks': []
+        }
+
+    for date, prompt_number, response in completed_prompts:
+        if date in response_data:
+            response_data[date]['completed_tasks'].append((prompt_number, response))
+        else:
+            response_data[date] = {
+                'journal_entry': None,
+                'completed_tasks': [(prompt_number, response)]
+            }
 
     return render_template('view_journal.html',
                            calendar=cal,
@@ -559,6 +570,8 @@ def view_journal():
                            next_year=next_year,
                            response_data=response_data,
                            current_date=datetime.now().strftime('%Y-%m-%d'))
+
+
 # Logout route
 @app.route('/logout')
 def logout():
