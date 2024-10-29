@@ -4,11 +4,11 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8">Dashboard</h1>
+    <h1 class="text-4xl font-bold mb-8">tasks</h1>
 
     <div class="bg-white shadow-md rounded-lg p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold">Today's Mental Health Tasks</h2>
+            <h2 class="text-2xl font-semibold">{{date}}</h2>
         </div>
 
         {% if prompts_and_responses %}

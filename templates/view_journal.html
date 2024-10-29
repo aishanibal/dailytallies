@@ -7,12 +7,12 @@
     <div class="flex justify-between items-center mb-4">
         <a href="{{ url_for('view_journal', year=prev_year, month=prev_month) }}"
            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Previous Month
+            previous month
         </a>
         <h2 class="text-2xl font-bold text-center">{{ month_name }} {{ year }}</h2>
         <a href="{{ url_for('view_journal', year=next_year, month=next_month) }}"
            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-            Next Month
+            next month
         </a>
     </div>
 
@@ -32,45 +32,20 @@
                 {% if day != 0 %}
                 {% set date = '%04d-%02d-%02d'|format(year, month, day) %}
                 <td class="border p-4 h-32 align-top {% if date == current_date %}bg-blue-100{% endif %}">
-                    <div class="flex justify-between"> <span class="font-bold">{{ day }}</span> </div>
+                    <div class="flex justify-between">
+                        <span class="font-bold">{{ day }}</span>
+                    </div>
 
                     <!-- Display Tasks -->
-
                     {% if date in response_data and response_data[date]['completed_tasks'] %}
-
                     <div class="mt-2 text-sm">
-
                         {% set num_completed_tasks = response_data[date]['completed_tasks'] | length %}
-                        <div class="mb-8">
-                            <img src="{{ url_for('static', filename='images/tally_' + num_completed_tasks|string + '.png') }}" alt="Tally Image" class="w-32 h-32 object-cover">
+                        <div class="-mb-2">
+                            <img src="{{ url_for('static', filename='images/tally_' + num_completed_tasks|string + '.png') }}" alt="Tally Image" class="w-32 h-32 object-cover cursor-pointer -mb-3 -mt-8" onclick="showButtonModal('{{ date|e }}')">
                         </div>
-                        <ul class="list-disc pl-4">
-                            {% for task in response_data[date]['completed_tasks'] %}
-                            <li class="{% if task.completed %}line-through text-gray-500{% endif %}">
-
-                                <!-- Button to show full prompt text if it overflows -->
-                                {% if task[1] | length > 50 %} {# Adjust length as needed #}
-                                    <button onclick="showPromptModal('{{ date|e }}', '{{ task[1]|e }}')"
-                                            class="text-blue-500 underline text-xs ml-2">
-                                        Read More
-                                    </button>
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-
                     </div>
                     {% endif %}
 
-                    <!-- Display Journal Entry -->
-                    {% if date in response_data and response_data[date]['journal_entry'] %}
-                    <div class="mt-2 text-sm">
-                        <button onclick="showJournalModal('{{ date|e }}', '{{ response_data[date]['journal_entry']|e }}')"
-                                class="text-blue-500 underline">
-                            Journal Entry
-                        </button>
-                    </div>
-                    {% endif %}
                 </td>
                 {% else %}
                 <td class="border p-4 bg-gray-50"></td>
@@ -81,7 +56,7 @@
         </tbody>
     </table>
 
-    <!-- Journal and Prompt Entry Modal -->
+    <!-- Journal Modal -->
     <div id="journalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
             <div class="flex justify-between items-center mb-4">
@@ -93,9 +68,72 @@
             <div id="modalContent" class="max-h-96 overflow-y-auto"></div>
         </div>
     </div>
+
+    <!-- Button Pop-Up Modal -->
+    <div id="buttonModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 id="modalDateTitle" class="text-xl font-bold mb-4"></h3>
+            <div id="buttonContainer" class="flex flex-col space-y-2">
+                <button id="journalEntryButton" class="text-blue-500 underline">View Journal Entry</button>
+                <!-- Dynamic buttons for prompts will be added here -->
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="closeButtonModal()" class="text-gray-600 hover:text-gray-800">
+                    <span class="text-lg">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+let currentDate = '';
+let currentJournalEntry = '';
+
+function showButtonModal(date) {
+    currentDate = date;
+    document.getElementById('modalDateTitle').textContent = `options for ${date}`;
+    const buttonContainer = document.getElementById('buttonContainer');
+    buttonContainer.innerHTML = ''; // Clear previous buttons
+
+    // Get the corresponding journal entry and prompts from response_data
+    const responseData = {{ response_data|tojson }};
+    if (responseData[date]) {
+        currentJournalEntry = responseData[date]['journal_entry'] || '';
+
+        // Add journal entry button
+        const journalEntryButton = document.createElement('button');
+        journalEntryButton.textContent = 'view journal entry';
+        journalEntryButton.className = 'text-blue-500 underline';
+        journalEntryButton.onclick = function() {
+            closeButtonModal();
+            showJournalModal(date, currentJournalEntry);
+        };
+        buttonContainer.appendChild(journalEntryButton);
+
+        // Add prompt buttons
+        const prompts = responseData[date]['completed_tasks'];
+        if (prompts && prompts.length > 0) {
+            prompts.forEach((task, index) => {
+                const promptButton = document.createElement('button');
+                promptButton.textContent = `prompt ${index + 1}`;
+                promptButton.className = 'text-blue-500 underline';
+                promptButton.onclick = function() {
+                    closeButtonModal();
+                    showPromptModal(date, task[1]);
+                };
+                buttonContainer.appendChild(promptButton);
+            });
+        }
+    }
+
+    document.getElementById('buttonModal').classList.remove('hidden');
+}
+
+function closeButtonModal() {
+    document.getElementById('buttonModal').classList.add('hidden');
+}
+
 function showJournalModal(date, content) {
     document.getElementById('modalDate').textContent = date;
     document.getElementById('modalContent').innerHTML = content;
@@ -103,7 +141,7 @@ function showJournalModal(date, content) {
 }
 
 function showPromptModal(date, content) {
-    document.getElementById('modalDate').textContent = `Prompt for ${date}`;
+    document.getElementById('modalDate').textContent = `prompt details`;
     document.getElementById('modalContent').textContent = content;
     document.getElementById('journalModal').classList.remove('hidden');
 }
