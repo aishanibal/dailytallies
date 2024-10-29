@@ -1,18 +1,21 @@
-<!-- templates/journal.html -->
 {% extends "base.html" %}
 
 {% block title %}Journal{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-<h1 class="text-4xl font-bold mb-8">Journal</h1>
+<h1 class="text-4xl font-bold mb-8 text-primary text-center">Journal</h1>
 
-<form action="{{ url_for('submit_journal') }}" method="POST" class="space-y-4">
-    <div>
-        <label class="block text-gray-700 text-lg mb-2">Today's Journal Entry</label>
-        <textarea name="journal_entry" rows="6" class="w-full px-3 py-2 border rounded"></textarea>
+<form action="{{ url_for('submit_journal') }}" method="POST" class="space-y-4 max-w-3xl mx-auto">
+    <div class="relative bg-gray-100 p-6 rounded-lg shadow-lg"
+         style="background: #f9f8f6 url('https://www.transparenttextures.com/patterns/linen.png'); border: 2px solid #d1d5db;">
+        <label class="block text-gray-700 text-lg mb-2 font-semibold">Today's Journal Entry</label>
+        <textarea name="journal_entry" rows="10" class="w-full p-6 border-2 border-gray-300 rounded-lg shadow-inner bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                  style="background: repeating-linear-gradient(#f9f8f6, #f9f8f6 24px, #e2e8f0 25px);
+                         line-height: 1.8; font-family: 'Roboto', sans-serif; color: #2d3748; font-size: 18px;
+                         border: none; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);">
+        {{entry_text}}</textarea>
+        <div class="absolute inset-0 border-2 border-gray-300 rounded-lg pointer-events-none" style="z-index: -1;"></div>
     </div>
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Entry</button>
+    <button type="submit" class="bg-primary text-white px-6 py-2 rounded hover:bg-secondary block mx-auto">Save Entry</button>
 </form>
-</div>
 {% endblock %}

@@ -9,16 +9,22 @@ h1, h2, h3, h4, h5, h6, a, button {
     color: #689689;
 }
 
-a.bg-blue-500{
+a.bg-blue-500, button.bg-blue-500{
     background-color: #6181A2;
+    border-radius: 999px;
 }
 
-a.bg-green-500{
+a.bg-green-500, button.bg-green-500{
     background-color: #A9CDCD;
+    border-radius: 999px;
 }
 
-a.bg-green-500.hover, a.bg-blue-500.hover{
+a.bg-green-600, button.bg-green-600{
     background-color: #D4EBED;
+}
+
+a.bg-blue-600, button.bg-blue-600{
+    background-color: #9eb3ca;
 }
 
 body.bg-gray-100{
@@ -36,7 +42,7 @@ button {
     background-color: #A9CDCD !important;
     color: #fff !important;
     padding: 0.5rem 1rem;
-    border-radius: 60px;
+    border-radius: 9999px;
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -73,6 +79,8 @@ button {
     height: 100%;
     object-fit: cover;
     object-position: center;
+    animation: fadeIn 1s ease-out;
+
 }
 
 img.max-w-full{

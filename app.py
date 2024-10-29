@@ -126,7 +126,20 @@ def login():
 @app.route('/journal', methods=['GET'])
 @login_required
 def journal():
-    return render_template('journal.html')
+    today = datetime.now().strftime('%Y-%m-%d')
+
+    # Fetch the journal entry for today, if it exists
+    conn = sqlite3.connect('daily_tallies.db')
+    c = conn.cursor()
+    c.execute("""SELECT entry FROM journal_entries WHERE user_id = ? AND date = ?""",
+              (session['user_id'], today))
+    journal_entry = c.fetchone()
+    conn.close()
+
+    # If a journal entry exists, get the entry text; otherwise, set it to an empty string
+    entry_text = journal_entry[0] if journal_entry else ""
+
+    return render_template('journal.html', entry_text=entry_text)
 
 # Submit Journal Entry Route
 @app.route('/submit_journal', methods=['POST'])
