@@ -4,11 +4,11 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8">Dashboard</h1>
+    <h1 class="text-4xl font-bold mb-8">Tasks </h1>
 
     <div class="bg-white shadow-md rounded-lg p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold">Today's Mental Health Tasks</h2>
+            <h2 class="text-2xl font-semibold">{{date}}</h2>
         </div>
 
         {% if prompts_and_responses %}
@@ -22,7 +22,7 @@
                                     <input type="hidden" name="response" value="{% if response %}{% else %}{{prompt}}{% endif %}">
                                     <input type="checkbox"
                                            id="prompt_{{ number }}"
-                                           class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                           class="strike-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer"
                                            onchange="this.form.submit()"
                                            {% if response %}checked{% endif %}>
                                 </form>
