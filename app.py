@@ -2,6 +2,8 @@ import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import calendar
 import sqlite3
+import bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import anthropic
 from functools import wraps
@@ -177,11 +179,11 @@ def init_db():
     c = conn.cursor()
 
     # Execute and fetch query results
-   # c.execute("SELECT * FROM responses")
-   # rows = c.fetchall()
+    c.execute("SELECT * FROM users")
+    rows = c.fetchall()
 
-    #for row in rows:
-     #   print(row)
+    for row in rows:
+        print(row)
 
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -273,19 +275,28 @@ PROMPT_CATEGORIES = {
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']  # In production, hash this password
+        password = request.form['password']
         age_range = request.form['age_range']
         gender = request.form['gender']
         employment_status = request.form['employment_status']
         selected_categories = request.form.getlist('prompt_categories')
         prompt_categories = ",".join(selected_categories)  # Store as comma-separated string
 
+        # Validate password length
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long!')
+            return redirect(url_for('register'))
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
         conn = sqlite3.connect('daily_tallies.db')
         c = conn.cursor()
         try:
+            # Insert user data including hashed password
             c.execute("""INSERT INTO users (username, password, age_range, gender, employment_status, prompt_categories)
                          VALUES (?, ?, ?, ?, ?, ?)""",
-                      (username, password, age_range, gender, employment_status, prompt_categories))
+                      (username, hashed_password, age_range, gender, employment_status, prompt_categories))
             conn.commit()
             flash('Registration successful! Please login.')
             return redirect(url_for('login'))
@@ -294,7 +305,6 @@ def register():
         finally:
             conn.close()
     return render_template('register.html', prompt_categories=PROMPT_CATEGORIES)
-
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -304,14 +314,17 @@ def login():
 
         conn = sqlite3.connect('daily_tallies.db')
         c = conn.cursor()
-        c.execute("SELECT id, password FROM users WHERE username = ?", (username,))
+        c.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = c.fetchone()
         conn.close()
 
-        if user and user[1] == password:  # In production, verify hashed password
+        if user and check_password_hash(user[2], password):  # Adjust index for the 'password' column
             session['user_id'] = user[0]
+            flash('Login successful!')
             return redirect(url_for('dashboard'))
-        flash('Invalid username or password!')
+        else:
+            flash('Invalid username or password!')
+
     return render_template('login.html')
 
 
