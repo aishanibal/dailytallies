@@ -1,4 +1,4 @@
-**Daily Tallies **
+** Daily Tallies **
 
 Daily Tallies is an mindfulness app powered by Anthropic API that helps you maintain a balanced routine through suggesting personalized tasks every day. The app learns from your interactions and adjusts its suggestions to maximize your success in building lasting positive habits.
 
